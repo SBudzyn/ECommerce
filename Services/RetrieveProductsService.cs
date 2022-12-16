@@ -29,8 +29,11 @@ namespace ECommerce.Services
         {
             var item = dbSet.FirstOrDefault(i => i.Id == id);
             var mappedItem = _mapper.Map<U>(item);
-            mappedItem.Rating = _ratingService.GetAverageRating(item!.Reviews);
-            mappedItem.NumberOfReviews = item.Reviews.Count() == 0 ? null : item.Reviews.Count();
+            if (item != null)
+            {
+                mappedItem.Rating = _ratingService.GetAverageRating(item!.Reviews);
+                mappedItem.NumberOfReviews = item.Reviews.Count() == 0 ? null : item.Reviews.Count();             
+            }
             return mappedItem;
         }
 

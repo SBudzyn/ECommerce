@@ -6,14 +6,33 @@ namespace ECommerce.Services
 {
     public class PhonesFilterService : IFilter<PhoneFilters, Phone>
     {
-        private IFilter<ProductFilters, Product> _productFilter;
-        public PhonesFilterService(IFilter<ProductFilters, Product> productFilters)
+
+        public PhonesFilterService()
         {
-            _productFilter = productFilters;
+       
         }
         public IEnumerable<Phone?> Filter(PhoneFilters filters, IQueryable<Phone> phones)
         {
-            _productFilter.Filter(filters, phones);          
+            if (filters.Manufacturer != null)
+            {
+                phones = phones.Where(p => p.Manufacturer != null).Where(p => p.Manufacturer!.Name.ToLower() == filters.Manufacturer.ToLower());
+            }
+            if (filters.MinPrice != null)
+            {
+                phones = phones.Where(p => p.Price >= filters.MinPrice);
+            }
+            if (filters.MaxPrice != null)
+            {
+                phones = phones.Where(p => p.Price <= filters.MaxPrice);
+            }
+            if (filters.Year != null)
+            {
+                phones = phones.Where(p => filters.Year.Any(y => y == p.Year));
+            }
+            if (filters.Color != null)
+            {
+                phones = phones.Where(p => filters.Color.Any(y => y.ToLower() == p.Color.ToLower()));
+            }
             if (filters.MinMemory != null)
             {
                 phones = phones.Where(p => p.Memory >= filters.MinMemory);
@@ -39,7 +58,7 @@ namespace ECommerce.Services
                 phones = phones.Where(p => p.DisplaySize <= filters.MaxDisplaySize);
             }
 
-            return phones;
+            return phones.ToList();
         }
     }
 }

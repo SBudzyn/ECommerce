@@ -13,10 +13,8 @@ namespace ECommerce.Services
             {
                 return default(T);
             }
-            else
-            {
-                return value;
-            }
+
+            return value;
 
                 
         }

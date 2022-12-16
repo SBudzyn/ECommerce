@@ -7,15 +7,33 @@ namespace ECommerce.Services.FilterServices
 {
     public class TabletsFilterService : IFilter<TabletFilters, Tablet>
     {
-        private IFilter<ProductFilters, Product> _productFilter;
-        public TabletsFilterService(IFilter<ProductFilters, Product> productFilters)
+        public TabletsFilterService()
         {
-            _productFilter = productFilters;
+   
         }
 
         public IEnumerable<Tablet?> Filter(TabletFilters filters, IQueryable<Tablet> tablets)
         {
-            _productFilter.Filter(filters, tablets);
+            if (filters.Manufacturer != null)
+            {
+                tablets = tablets.Where(p => p.Manufacturer != null).Where(p => p.Manufacturer!.Name.ToLower() == filters.Manufacturer.ToLower());
+            }
+            if (filters.MinPrice != null)
+            {
+                tablets = tablets.Where(p => p.Price >= filters.MinPrice);
+            }
+            if (filters.MaxPrice != null)
+            {
+                tablets = tablets.Where(p => p.Price <= filters.MaxPrice);
+            }
+            if (filters.Year != null)
+            {
+                tablets = tablets.Where(p => filters.Year.Any(y => y == p.Year));
+            }
+            if (filters.Color != null)
+            {
+                tablets = tablets.Where(p => filters.Color.Any(y => y.ToLower() == p.Color.ToLower()));
+            }
             if (filters.MinDisplaySize != null)
             {
                 tablets = tablets.Where(t => t.DisplaySize >= filters.MinDisplaySize);
@@ -32,7 +50,7 @@ namespace ECommerce.Services.FilterServices
             {
                 tablets = tablets.Where(t => t.Memory <= filters.MaxMemory);
             }
-            return tablets;
+            return tablets.ToList();
         }
     }
 }

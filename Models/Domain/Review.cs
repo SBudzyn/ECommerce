@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ECommerce.Models
 {
@@ -10,14 +9,14 @@ namespace ECommerce.Models
         {
 
         }
-        public Review(string name, string email, int mark, int phoneId, string? phoneNumber = null, string? description = null)
+        public Review(string name, string email, int mark, int productId, string? phoneNumber = null, string? description = null)
         {
             Name = name;
             Email = email;
             Mark = mark;
             PhoneNumber = phoneNumber;
             Description = description;
-            PhoneId = phoneId;
+            ProductId = productId;
         }
         public int Id { get; private set; }
         [Required]
@@ -34,6 +33,6 @@ namespace ECommerce.Models
         [StringLength(500, MinimumLength = 5)]
         public string? Description { get; set; }
         [Required]
-        public int PhoneId { get; set; }
+        public int ProductId { get; set; }
     }
 }

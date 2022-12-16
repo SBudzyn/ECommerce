@@ -7,14 +7,32 @@ namespace ECommerce.Services.FilterServices
 {
     public class FridgesFilterService : IFilter<FridgeFilters, Fridge>
     {
-        private IFilter<ProductFilters, Product> _productFilter;
-        public FridgesFilterService(IFilter<ProductFilters, Product> productFilters)
+        public FridgesFilterService()
         {
-            _productFilter = productFilters;
+            
         }
         public IEnumerable<Fridge?> Filter(FridgeFilters filters, IQueryable<Fridge> fridges)
         {
-            _productFilter.Filter(filters, fridges);
+            if (filters.Manufacturer != null)
+            {
+                fridges = fridges.Where(p => p.Manufacturer != null).Where(p => p.Manufacturer!.Name.ToLower() == filters.Manufacturer.ToLower());
+            }
+            if (filters.MinPrice != null)
+            {
+                fridges = fridges.Where(p => p.Price >= filters.MinPrice);
+            }
+            if (filters.MaxPrice != null)
+            {
+                fridges = fridges.Where(p => p.Price <= filters.MaxPrice);
+            }
+            if (filters.Year != null)
+            {
+                fridges = fridges.Where(p => filters.Year.Any(y => y == p.Year));
+            }
+            if (filters.Color != null)
+            {
+                fridges = fridges.Where(p => filters.Color.Any(y => y.ToLower() == p.Color.ToLower()));
+            }
             if (filters.MinHeight != null)
             {
                 fridges = fridges.Where(f => f.Height >= filters.MinHeight);
@@ -48,7 +66,7 @@ namespace ECommerce.Services.FilterServices
                 fridges = fridges.Where(f => f.Volume <= filters.MaxVolume);
             }
 
-            return fridges;
+            return fridges.ToList();
         }
     }
 }

@@ -7,15 +7,34 @@ namespace ECommerce.Services.FilterServices
 {
     public class TelevisionsFilterService : IFilter<TelevisionFilters, Television>
     {
-        private IFilter<ProductFilters, Product> _productFilter;
-        public TelevisionsFilterService(IFilter<ProductFilters, Product> productFilters)
+       
+        public TelevisionsFilterService()
         {
-            _productFilter = productFilters;
+
         }
 
         public IEnumerable<Television?> Filter(TelevisionFilters filters, IQueryable<Television> televisions)
         {
-            _productFilter.Filter(filters, televisions);
+            if (filters.Manufacturer != null)
+            {
+                televisions = televisions.Where(p => p.Manufacturer != null).Where(p => p.Manufacturer!.Name.ToLower() == filters.Manufacturer.ToLower());
+            }
+            if (filters.MinPrice != null)
+            {
+                televisions = televisions.Where(p => p.Price >= filters.MinPrice);
+            }
+            if (filters.MaxPrice != null)
+            {
+                televisions = televisions.Where(p => p.Price <= filters.MaxPrice);
+            }
+            if (filters.Year != null)
+            {
+                televisions = televisions.Where(p => filters.Year.Any(y => y == p.Year));
+            }
+            if (filters.Color != null)
+            {
+                televisions = televisions.Where(p => filters.Color.Any(y => y.ToLower() == p.Color.ToLower()));
+            }
             if (filters.MinDisplaySize != null)
             {
                 televisions = televisions.Where(t => t.DisplaySize >= filters.MinDisplaySize);
@@ -26,9 +45,9 @@ namespace ECommerce.Services.FilterServices
             }
             if (filters.Resolution != null)
             {
-                televisions = televisions.Where(t => filters.Resolution.Any(r => r.ToLower() == t.Resolution.ToLower()));
+                televisions = televisions.Where(t => t.Resolution != null).Where(t => filters.Resolution.Any(r => r.ToLower() == t.Resolution!.ToLower()));
             }
-            return televisions;
+            return televisions.ToList();
         }
     }
 }

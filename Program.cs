@@ -16,7 +16,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ECommerceContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddTransient<IFilter<ProductFilters, Product>, ProductsFilterService>();
 builder.Services.AddTransient<IFilter<PhoneFilters, Phone>, PhonesFilterService>();
 builder.Services.AddTransient<IFilter<FridgeFilters, Fridge>, FridgesFilterService>();
 builder.Services.AddTransient<IFilter<HeadphonesFilters, Headphones>, HeadphonesFilterService>();

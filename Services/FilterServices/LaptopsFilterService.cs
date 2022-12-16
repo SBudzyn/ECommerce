@@ -6,15 +6,33 @@ namespace ECommerce.Services.FilterServices
 {
     public class LaptopsFilterService : IFilter<LaptopFilters, Laptop>
     {
-        private IFilter<ProductFilters, Product> _productFilter;
-        public LaptopsFilterService(IFilter<ProductFilters, Product> productFilters)
+        public LaptopsFilterService()
         {
-            _productFilter = productFilters;
+         
         }
 
         public IEnumerable<Laptop?> Filter(LaptopFilters filters, IQueryable<Laptop> laptops)
         {
-            _productFilter.Filter(filters, laptops);
+            if (filters.Manufacturer != null)
+            {
+                laptops = laptops.Where(p => p.Manufacturer != null).Where(p => p.Manufacturer!.Name.ToLower() == filters.Manufacturer.ToLower());
+            }
+            if (filters.MinPrice != null)
+            {
+                laptops = laptops.Where(p => p.Price >= filters.MinPrice);
+            }
+            if (filters.MaxPrice != null)
+            {
+                laptops = laptops.Where(p => p.Price <= filters.MaxPrice);
+            }
+            if (filters.Year != null)
+            {
+                laptops = laptops.Where(p => filters.Year.Any(y => y == p.Year));
+            }
+            if (filters.Color != null)
+            {
+                laptops = laptops.Where(p => filters.Color.Any(y => y.ToLower() == p.Color.ToLower()));
+            }
             if (filters.MinDisplaySize != null)
             {
                 laptops = laptops.Where(l => l.DisplaySize >= filters.MinDisplaySize);
@@ -47,7 +65,7 @@ namespace ECommerce.Services.FilterServices
             {
                 laptops = laptops.Where(l => filters.OperatingSystem.Any(p => p.ToLower() == l.OperatingSystem.ToLower()));
             }
-            return laptops;
+            return laptops.ToList();
         }
     }
 }

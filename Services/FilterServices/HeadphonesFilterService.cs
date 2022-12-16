@@ -7,15 +7,33 @@ namespace ECommerce.Services.FilterServices
 {
     public class HeadphonesFilterService : IFilter<HeadphonesFilters, Headphones>
     {
-        private IFilter<ProductFilters, Product> _productFilter;
-        public HeadphonesFilterService(IFilter<ProductFilters, Product> productFilters)
+        public HeadphonesFilterService()
         {
-            _productFilter = productFilters;
+
         }
 
         public IEnumerable<Headphones?> Filter(HeadphonesFilters filters, IQueryable<Headphones> headphones)
         {
-            _productFilter.Filter(filters, headphones);
+            if (filters.Manufacturer != null)
+            {
+                headphones = headphones.Where(p => p.Manufacturer != null).Where(p => p.Manufacturer!.Name.ToLower() == filters.Manufacturer.ToLower());
+            }
+            if (filters.MinPrice != null)
+            {
+                headphones = headphones.Where(p => p.Price >= filters.MinPrice);
+            }
+            if (filters.MaxPrice != null)
+            {
+                headphones = headphones.Where(p => p.Price <= filters.MaxPrice);
+            }
+            if (filters.Year != null)
+            {
+                headphones = headphones.Where(p => filters.Year.Any(y => y == p.Year));
+            }
+            if (filters.Color != null)
+            {
+                headphones = headphones.Where(p => filters.Color.Any(y => y.ToLower() == p.Color.ToLower()));
+            }
             if (filters.ConnectionType != null)
             {
                 headphones.Where(h => h.ConnectionType == filters.ConnectionType);
@@ -24,7 +42,7 @@ namespace ECommerce.Services.FilterServices
             {
                 headphones.Where(h => h.IsWaterProof == filters.IsWaterProof);
             }
-            return headphones;
+            return headphones.ToList();
         }
     }
 }

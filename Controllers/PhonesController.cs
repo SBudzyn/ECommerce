@@ -14,12 +14,10 @@ namespace ECommerce.Controllers
     public class PhonesController : ControllerBase
     {
         private RetrieveProductsService<Phone, PhoneFullResponse, PhoneFilters> _retrieveService;
-        IValidate<Review> _validator;
         private IPostReview _postReview;
         public PhonesController(RetrieveProductsService<Phone, PhoneFullResponse, PhoneFilters> retrieveService, IValidate<Review> validator, IPostReview postReview)
         {
             _retrieveService = retrieveService;
-            _validator = validator;
             _postReview = postReview;
         }
         [HttpGet("{id:int}")]
@@ -47,28 +45,13 @@ namespace ECommerce.Controllers
         [Route("PostResponse/{id}")]
         public ActionResult PostReview(int id, [FromBody] Review review)
         {
-            var phone = _retrieveService.GetById(id);
-            if (phone == null)
+            bool result = _postReview.PostReview(review);
+            if (result == false)
             {
                 return BadRequest();
             }
 
-            var validatedReview = _validator.Validate(review);
-            if (validatedReview == null)
-            {
-                return BadRequest();
-            }
-
-            var isAdded = _postReview.PostReview(review);
-
-            if (isAdded == true)
-            {
-                return CreatedAtAction(nameof(PostReview), review);
-            }
-            else
-            {
-                return BadRequest();
-            }
+            return CreatedAtAction(nameof(PostReview), review);
 
         }
         
